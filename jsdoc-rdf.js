@@ -52,9 +52,22 @@ class TurtleRDFPlugin {
     processDoclet(doclet) {
         console.log('Processing doclet:', doclet.longname, doclet.kind, doclet.undocumented);
         
-        if (!doclet.longname || doclet.undocumented) return;
+        // Skip if no longname or if it's a system doclet
+        if (!doclet.longname || doclet.kind === 'package' || doclet.undocumented) {
+            console.log('Skipping doclet:', doclet.longname || 'unnamed');
+            return;
+        }
+        
+        // Skip anonymous functions and internal members
+        if (doclet.longname.startsWith('(') || doclet.longname.includes('.')) {
+            return;
+        }
 
-        const subject = factory.namedNode(this.baseUri + doclet.longname);
+        // Create a safe URI for the subject
+        const safeLongname = doclet.longname.replace(/#/g, '/').replace(/\./g, '/');
+        const subject = factory.namedNode(this.baseUri + safeLongname);
+        
+        console.log('Adding doclet to RDF:', doclet.longname, 'as', subject.value);
 
         this.addTriple(subject, factory.namedNode(namespaces.rdfs.value + 'label'), factory.literal(doclet.name));
         this.addTriple(subject, factory.namedNode(namespaces.dcterms.value + 'description'), factory.literal(doclet.description || ''));

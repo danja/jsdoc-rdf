@@ -1,24 +1,26 @@
 {
   "source": {
-    "include": [
-      "./"
-    ],
+    "include": ["./example.js"],
     "includePattern": "\\.(js|jsx)$",
-    "exclude": [
-      "node_modules/"
-    ]
+    "exclude": ["node_modules/", "*.test.js"]
   },
   "opts": {
-    "destination": "./docs/"
+    "destination": "./docs/",
+    "recurse": true,
+    "readme": "./README.md"
   },
-  "plugins": [
-    "./jsdoc-rdf.js"
-  ],
+  "plugins": ["./jsdoc-rdf.js"],
   "templates": {
     "cleverLinks": false,
-    "monospaceLinks": false
+    "monospaceLinks": false,
+    "default": {
+      "outputSourceFiles": true
+    }
   },
   "rdfConfig": {
-    "baseUri": "https://your-project.com/api/"
+    "baseUri": "https://example.com/api/"
+  },
+  "markdown": {
+    "idInHeadings": true
   }
 }
