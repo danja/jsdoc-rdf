@@ -23,6 +23,9 @@ Place `jsdoc-rdf.js` in your project directory and add to JSDoc configuration:
   "plugins": ["./jsdoc-rdf.js"],
   "opts": {
     "destination": "./docs/"
+  },
+  "rdfConfig": {
+    "baseUri": "https://your-project.com/api/"
   }
 }
 ```
@@ -41,6 +44,22 @@ jsdoc --plugin ./jsdoc-rdf.js source-files.js -d ./docs/
 
 - Standard JSDoc HTML documentation in `./docs/`
 - Semantic RDF documentation in `./docs/api-documentation.ttl`
+
+## Configuration
+
+### Base URI
+
+Configure the RDF namespace via `rdfConfig.baseUri` in JSDoc configuration:
+
+```json
+{
+  "rdfConfig": {
+    "baseUri": "https://myproject.example.org/api/"
+  }
+}
+```
+
+Default: `http://example.org/api/`
 
 ## ES Module Support
 
@@ -93,17 +112,36 @@ The plugin maps JSDoc elements to RDF using these vocabularies:
 - **DCTERMS**: `http://purl.org/dc/terms/` - Dublin Core terms
 - **RDFS**: `http://www.w3.org/2000/01/rdf-schema#` - RDF Schema elements
 - **JSDOC**: `http://example.org/jsdoc#` - Custom JSDoc properties
-- **DOAP**: `http://usefulinc.com/ns/doap#` - Description of a Project vocabulary
+- **XSD**: `http://www.w3.org/2001/XMLSchema#` - XML Schema datatypes
 
 ## Supported JSDoc Tags
 
-- `@param` → `jsdoc:hasParameter`
+### Core Documentation
+- `@param` → `jsdoc:hasParameter` with optional/defaultValue flags
 - `@returns` → `jsdoc:returns`
+- `@throws` → `jsdoc:throws`
 - `@example` → `jsdoc:hasExample`
+- `@description` → `dcterms:description`
+
+### Metadata
 - `@author` → `dcterms:creator`
 - `@version` → `dcterms:hasVersion`
 - `@since` → `dcterms:created`
-- `@description` → `dcterms:description`
+- `@see` → `rdfs:seeAlso`
+- `@todo` → `jsdoc:todo`
+
+### Structure & Access
+- `@memberof` → `jsdoc:memberOf`
+- `@access` → `jsdoc:access`
+- `@scope` → `jsdoc:scope`
+- `@readonly` → `jsdoc:readonly`
+- `@deprecated` → `jsdoc:deprecated`
+- `@abstract` → `jsdoc:abstract`
+- `@override` → `jsdoc:override`
+
+### Inheritance
+- `@extends` / `@augments` → `jsdoc:extends`
+- `@implements` → `jsdoc:implements`
 
 ## Example Output
 
@@ -111,40 +149,26 @@ The plugin maps JSDoc elements to RDF using these vocabularies:
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
 @prefix dcterms: <http://purl.org/dc/terms/> .
 @prefix jsdoc: <http://example.org/jsdoc#> .
-@prefix doap: <http://usefulinc.com/ns/doap#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<http://example.org/api/UserManager>
+<https://your-project.com/api/UserManager>
     rdfs:label "UserManager" ;
     dcterms:description "User management utility class" ;
     jsdoc:kind "class" ;
     dcterms:creator "John Developer" ;
-    dcterms:hasVersion "2.1.0" .
+    dcterms:hasVersion "2.1.0" ;
+    jsdoc:hasParameter <https://your-project.com/api/UserManager/createUser/param/0> .
 
-<http://example.org/api/project> a doap:Project ;
-    doap:name "JSDoc Turtle RDF Plugin" ;
-    doap:maintainer <https://danny.ayers.name#me> .
+<https://your-project.com/api/UserManager/createUser/param/0>
+    rdfs:label "name" ;
+    dcterms:description "The user's full name" ;
+    jsdoc:parameterType "string" .
 ```
 
 ## DOAP Project Profile
 
-A standalone DOAP (Description of a Project) profile is included as `project.ttl`. This provides semantic metadata about the plugin project itself, including:
-
-- Project description and homepage
-- Maintainer and developer information
-- Repository location and license
-- Programming language and categories
-
-## Configuration Options
-
-Modify the plugin's `baseUri` property to customize RDF namespace. Since this uses ES modules, you can import and extend the plugin:
-
-```javascript
-// Custom plugin configuration
-import { handlers, definePlugin } from './jsdoc-rdf.js';
-
-// Modify baseUri before JSDoc processing
-// Access through plugin instance during beforeParse handler
-```
+A static DOAP (Description of a Project) profile is included as `doap.ttl`. This provides semantic metadata about the plugin project itself. The generated RDF documentation focuses solely on your documented JavaScript code.
 
 ## Requirements
 

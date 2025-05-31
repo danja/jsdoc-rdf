@@ -17,5 +17,8 @@
   "templates": {
     "cleverLinks": false,
     "monospaceLinks": false
+  },
+  "rdfConfig": {
+    "baseUri": "https://your-project.com/api/"
   }
 }

@@ -1,5 +1,4 @@
 This file is a merged representation of a subset of the codebase, containing files not matching ignore patterns, combined into a single document by Repomix.
-The content has been processed where comments have been removed.
 
 <file_summary>
 This section contains a summary of this file.
@@ -37,7 +36,6 @@ The content is organized as follows:
 - Files matching these patterns are excluded: old, dist, js/lib, docs, .env, knowledge, **/_*/**, _*, **/_*, **/webpack/*, *.log, **/*repopack*, **/*repomix*, **/*old*, **/*prompt*
 - Files matching patterns in .gitignore are excluded
 - Files matching default ignore patterns are excluded
-- Code comments have been removed from supported file types
 - Files are sorted by Git change count (files with more changes are at the bottom)
 </notes>
 
@@ -106,188 +104,321 @@ This section contains the contents of the repository's files.
     rdfs:seeAlso <https://danny.ayers.name/foaf.rdf> .
 </file>
 
+<file path="example.js">
+/**
+ * User management utility class
+ * @class UserManager
+ * @author John Developer
+ * @version 2.1.0
+ * @since 1.0.0
+ * @example
+ * const manager = new UserManager();
+ * const user = await manager.createUser('John', 'john@example.com');
+ */
+class UserManager {
+    /**
+     * Creates a new user account
+     * @async
+     * @param {string} name - The user's full name
+     * @param {string} email - The user's email address
+     * @param {Object} [options={}] - Additional user options
+     * @param {string} [options.role="user"] - User role
+     * @param {boolean} [options.active=true] - Account status
+     * @returns {Promise<Object>} The created user object
+     * @example
+     * const user = await manager.createUser('Jane Doe', 'jane@example.com', { role: 'admin' });
+     */
+    async createUser(name, email, options = {}) {
+        return { id: 123, name, email, ...options };
+    }
+
+    /**
+     * Validates user credentials
+     * @param {string} email - User email
+     * @param {string} password - User password
+     * @returns {boolean} True if credentials are valid
+     * @example
+     * const isValid = manager.validateCredentials('user@example.com', 'password123');
+     */
+    validateCredentials(email, password) {
+        return true;
+    }
+}
+
+/**
+ * Formats a user's display name
+ * @function formatUserName
+ * @param {Object} user - User object
+ * @param {string} user.firstName - First name
+ * @param {string} user.lastName - Last name
+ * @returns {string} Formatted full name
+ * @author John Developer
+ * @since 1.2.0
+ * @example
+ * const formatted = formatUserName({ firstName: 'John', lastName: 'Doe' });
+ * // Returns: "John Doe"
+ */
+function formatUserName(user) {
+    return `${user.firstName} ${user.lastName}`;
+}
+
+export { UserManager, formatUserName };
+</file>
+
 <file path="jsdoc-rdf.js">
 import factory from 'rdf-ext';
-
 import fs from 'fs';
 import path from 'path';
-
 
 const namespaces = {
     foaf: factory.namedNode('http://xmlns.com/foaf/0.1/'),
     dcterms: factory.namedNode('http://purl.org/dc/terms/'),
     rdfs: factory.namedNode('http://www.w3.org/2000/01/rdf-schema#'),
     jsdoc: factory.namedNode('http://example.org/jsdoc#'),
-    xsd: factory.namedNode('http://www.w3.org/2001/XMLSchema#'),
-    doap: factory.namedNode('http://usefulinc.com/ns/doap#')
+    xsd: factory.namedNode('http://www.w3.org/2001/XMLSchema#')
 };
 
 class TurtleRDFPlugin {
-    constructor() {
+    constructor(config = {}) {
         this.dataset = factory.dataset();
-        this.baseUri = 'http://example.org/api/';
+        this.baseUri = config.baseUri || 'http://example.org/api/';
+        this.config = config;
     }
 
 
 
-
-    addDoapProfile() {
-        const project = factory.namedNode(this.baseUri + 'project');
-        const maintainer = factory.namedNode('https://danny.ayers.name#me');
-
-
-        this.addTriple(project, namespaces.rdfs + 'type', namespaces.doap + 'Project');
-        this.addTriple(project, namespaces.doap + 'name', factory.literal('JSDoc Turtle RDF Plugin'));
-        this.addTriple(project, namespaces.doap + 'shortdesc', factory.literal('JSDoc plugin to generate Turtle RDF documentation'));
-        this.addTriple(project, namespaces.doap + 'description', factory.literal('Converts JSDoc comments to semantic Turtle RDF format alongside standard HTML documentation'));
-        this.addTriple(project, namespaces.doap + 'homepage', factory.namedNode('https://github.com/danny-ayers/jsdoc-turtle-rdf-plugin'));
-        this.addTriple(project, namespaces.doap + 'programming-language', factory.literal('JavaScript'));
-        this.addTriple(project, namespaces.doap + 'license', factory.namedNode('http://usefulinc.com/doap/licenses/mit'));
-        this.addTriple(project, namespaces.doap + 'maintainer', maintainer);
-        this.addTriple(project, namespaces.doap + 'developer', maintainer);
-
-
-        this.addTriple(maintainer, namespaces.rdfs + 'type', namespaces.foaf + 'Person');
-        this.addTriple(maintainer, namespaces.foaf + 'name', factory.literal('Danny Ayers'));
-        this.addTriple(maintainer, namespaces.foaf + 'mbox', factory.namedNode('mailto:danny.ayers@gmail.com'));
-        this.addTriple(maintainer, namespaces.foaf + 'homepage', factory.namedNode('https://danny.ayers.name'));
-
-
-        this.addTriple(project, namespaces.doap + 'revision', factory.literal('1.0.0'));
-        this.addTriple(project, namespaces.doap + 'created', factory.literal('2025-05-31', namespaces.xsd + 'date'));
-    }
-
-
-
-
+    /**
+     * Add RDF triple to dataset
+     */
     addTriple(subject, predicate, object) {
         const triple = factory.quad(subject, predicate, object);
         this.dataset.add(triple);
     }
 
-
-
-
+    /**
+     * Process JSDoc doclet into RDF triples
+     */
     processDoclet(doclet) {
         if (!doclet.longname || doclet.undocumented) return;
 
         const subject = factory.namedNode(this.baseUri + doclet.longname);
 
-
-        this.addTriple(subject, namespaces.rdfs + 'label', factory.literal(doclet.name));
-        this.addTriple(subject, namespaces.dcterms + 'description', factory.literal(doclet.description || ''));
+        this.addTriple(subject, factory.namedNode(namespaces.rdfs.value + 'label'), factory.literal(doclet.name));
+        this.addTriple(subject, factory.namedNode(namespaces.dcterms.value + 'description'), factory.literal(doclet.description || ''));
 
         // Kind (function, class, etc.)
-        this.addTriple(subject, namespaces.jsdoc + 'kind', factory.literal(doclet.kind));
+        this.addTriple(subject, factory.namedNode(namespaces.jsdoc.value + 'kind'), factory.literal(doclet.kind));
 
+        // Namespace
+        if (doclet.memberof) {
+            const memberOf = factory.namedNode(this.baseUri + doclet.memberof);
+            this.addTriple(subject, factory.namedNode(namespaces.jsdoc.value + 'memberOf'), memberOf);
+        }
+
+        // Access level
+        if (doclet.access) {
+            this.addTriple(subject, factory.namedNode(namespaces.jsdoc.value + 'access'), factory.literal(doclet.access));
+        }
+
+        // Modifiers
+        if (doclet.scope) {
+            this.addTriple(subject, factory.namedNode(namespaces.jsdoc.value + 'scope'), factory.literal(doclet.scope));
+        }
+        if (doclet.readonly) {
+            this.addTriple(subject, factory.namedNode(namespaces.jsdoc.value + 'readonly'), factory.literal('true', factory.namedNode(namespaces.xsd.value + 'boolean')));
+        }
+        if (doclet.deprecated) {
+            this.addTriple(subject, factory.namedNode(namespaces.jsdoc.value + 'deprecated'), factory.literal('true', factory.namedNode(namespaces.xsd.value + 'boolean')));
+        }
+        if (doclet.abstract) {
+            this.addTriple(subject, factory.namedNode(namespaces.jsdoc.value + 'abstract'), factory.literal('true', factory.namedNode(namespaces.xsd.value + 'boolean')));
+        }
+        if (doclet.override) {
+            this.addTriple(subject, factory.namedNode(namespaces.jsdoc.value + 'override'), factory.literal('true', factory.namedNode(namespaces.xsd.value + 'boolean')));
+        }
+
+        // Inheritance
+        if (doclet.augments) {
+            doclet.augments.forEach(parent => {
+                const parentNode = factory.namedNode(this.baseUri + parent);
+                this.addTriple(subject, factory.namedNode(namespaces.jsdoc.value + 'extends'), parentNode);
+            });
+        }
+        if (doclet.implements) {
+            doclet.implements.forEach(impl => {
+                const implNode = factory.namedNode(this.baseUri + impl);
+                this.addTriple(subject, factory.namedNode(namespaces.jsdoc.value + 'implements'), implNode);
+            });
+        }
 
         if (doclet.params) {
             doclet.params.forEach((param, index) => {
                 const paramNode = factory.namedNode(this.baseUri + doclet.longname + '/param/' + index);
-                this.addTriple(subject, namespaces.jsdoc + 'hasParameter', paramNode);
-                this.addTriple(paramNode, namespaces.rdfs + 'label', factory.literal(param.name));
-                this.addTriple(paramNode, namespaces.dcterms + 'description', factory.literal(param.description || ''));
+                this.addTriple(subject, factory.namedNode(namespaces.jsdoc.value + 'hasParameter'), paramNode);
+                this.addTriple(paramNode, factory.namedNode(namespaces.rdfs.value + 'label'), factory.literal(param.name));
+                this.addTriple(paramNode, factory.namedNode(namespaces.dcterms.value + 'description'), factory.literal(param.description || ''));
                 if (param.type) {
-                    this.addTriple(paramNode, namespaces.jsdoc + 'parameterType', factory.literal(param.type.names.join('|')));
+                    this.addTriple(paramNode, factory.namedNode(namespaces.jsdoc.value + 'parameterType'), factory.literal(param.type.names.join('|')));
+                }
+                if (param.optional) {
+                    this.addTriple(paramNode, factory.namedNode(namespaces.jsdoc.value + 'optional'), factory.literal('true', factory.namedNode(namespaces.xsd.value + 'boolean')));
+                }
+                if (param.defaultvalue !== undefined) {
+                    this.addTriple(paramNode, factory.namedNode(namespaces.jsdoc.value + 'defaultValue'), factory.literal(String(param.defaultvalue)));
                 }
             });
         }
-
 
         if (doclet.returns) {
             doclet.returns.forEach((ret, index) => {
                 const returnNode = factory.namedNode(this.baseUri + doclet.longname + '/return/' + index);
-                this.addTriple(subject, namespaces.jsdoc + 'returns', returnNode);
-                this.addTriple(returnNode, namespaces.dcterms + 'description', factory.literal(ret.description || ''));
+                this.addTriple(subject, factory.namedNode(namespaces.jsdoc.value + 'returns'), returnNode);
+                this.addTriple(returnNode, factory.namedNode(namespaces.dcterms.value + 'description'), factory.literal(ret.description || ''));
                 if (ret.type) {
-                    this.addTriple(returnNode, namespaces.jsdoc + 'returnType', factory.literal(ret.type.names.join('|')));
+                    this.addTriple(returnNode, factory.namedNode(namespaces.jsdoc.value + 'returnType'), factory.literal(ret.type.names.join('|')));
                 }
             });
         }
 
+        if (doclet.exceptions) {
+            doclet.exceptions.forEach((exc, index) => {
+                const excNode = factory.namedNode(this.baseUri + doclet.longname + '/throws/' + index);
+                this.addTriple(subject, factory.namedNode(namespaces.jsdoc.value + 'throws'), excNode);
+                this.addTriple(excNode, factory.namedNode(namespaces.dcterms.value + 'description'), factory.literal(exc.description || ''));
+                if (exc.type) {
+                    this.addTriple(excNode, factory.namedNode(namespaces.jsdoc.value + 'exceptionType'), factory.literal(exc.type.names.join('|')));
+                }
+            });
+        }
 
         if (doclet.examples) {
             doclet.examples.forEach((example, index) => {
                 const exampleNode = factory.namedNode(this.baseUri + doclet.longname + '/example/' + index);
-                this.addTriple(subject, namespaces.jsdoc + 'hasExample', exampleNode);
-                this.addTriple(exampleNode, namespaces.rdfs + 'label', factory.literal(example));
+                this.addTriple(subject, factory.namedNode(namespaces.jsdoc.value + 'hasExample'), exampleNode);
+                this.addTriple(exampleNode, factory.namedNode(namespaces.rdfs.value + 'label'), factory.literal(example));
             });
         }
 
+        if (doclet.see) {
+            doclet.see.forEach(ref => {
+                this.addTriple(subject, factory.namedNode(namespaces.rdfs.value + 'seeAlso'), factory.literal(ref));
+            });
+        }
+
+        if (doclet.todo) {
+            doclet.todo.forEach(todo => {
+                this.addTriple(subject, factory.namedNode(namespaces.jsdoc.value + 'todo'), factory.literal(todo));
+            });
+        }
 
         if (doclet.author) {
             doclet.author.forEach(author => {
-                this.addTriple(subject, namespaces.dcterms + 'creator', factory.literal(author));
+                this.addTriple(subject, factory.namedNode(namespaces.dcterms.value + 'creator'), factory.literal(author));
             });
         }
 
-
         if (doclet.version) {
-            this.addTriple(subject, namespaces.dcterms + 'hasVersion', factory.literal(doclet.version));
+            this.addTriple(subject, factory.namedNode(namespaces.dcterms.value + 'hasVersion'), factory.literal(doclet.version));
         }
 
-
         if (doclet.since) {
-            this.addTriple(subject, namespaces.dcterms + 'created', factory.literal(doclet.since));
+            this.addTriple(subject, factory.namedNode(namespaces.dcterms.value + 'created'), factory.literal(doclet.since));
         }
     }
 
-
-
-
-    async writeTurtle(outputPath) {
-
-        this.addDoapProfile();
-
-        const writer = factory.formats.writers.get('text/turtle');
-        const output = writer.import(this.dataset.toStream());
-
-        const chunks = [];
-        output.on('data', chunk => chunks.push(chunk));
-
-        return new Promise((resolve, reject) => {
-            output.on('end', () => {
-                const turtle = Buffer.concat(chunks).toString();
-                const prefixes = `@prefix foaf: <${namespaces.foaf.value}> .
+    /**
+     * Convert dataset to Turtle string
+     */
+    toTurtle() {
+        const prefixes = `@prefix foaf: <${namespaces.foaf.value}> .
 @prefix dcterms: <${namespaces.dcterms.value}> .
 @prefix rdfs: <${namespaces.rdfs.value}> .
 @prefix jsdoc: <${namespaces.jsdoc.value}> .
-@prefix doap: <${namespaces.doap.value}> .
 @prefix xsd: <${namespaces.xsd.value}> .
 
 `;
-                fs.writeFileSync(outputPath, prefixes + turtle);
-                resolve();
-            });
-            output.on('error', reject);
-        });
+
+        let turtle = '';
+        const subjects = new Set();
+        
+        // Collect all subjects
+        for (const quad of this.dataset) {
+            subjects.add(quad.subject.value);
+        }
+
+        // Generate Turtle for each subject
+        for (const subjectValue of subjects) {
+            const subject = factory.namedNode(subjectValue);
+            const quads = [...this.dataset.match(subject)];
+            
+            if (quads.length > 0) {
+                turtle += `<${subjectValue}>\n`;
+                
+                quads.forEach((quad, index) => {
+                    const predicate = this.abbreviateUri(quad.predicate.value);
+                    const object = this.formatObject(quad.object);
+                    const separator = index === quads.length - 1 ? ' .' : ' ;';
+                    turtle += `    ${predicate} ${object}${separator}\n`;
+                });
+                turtle += '\n';
+            }
+        }
+
+        return prefixes + turtle;
+    }
+
+    /**
+     * Abbreviate URI using known prefixes
+     */
+    abbreviateUri(uri) {
+        for (const [prefix, ns] of Object.entries(namespaces)) {
+            if (uri.startsWith(ns.value)) {
+                return `${prefix}:${uri.substring(ns.value.length)}`;
+            }
+        }
+        return `<${uri}>`;
+    }
+
+    /**
+     * Format RDF object for Turtle output
+     */
+    formatObject(object) {
+        if (object.termType === 'NamedNode') {
+            return this.abbreviateUri(object.value);
+        } else if (object.termType === 'Literal') {
+            if (object.datatype && object.datatype.value !== 'http://www.w3.org/2001/XMLSchema#string') {
+                return `"${object.value}"^^${this.abbreviateUri(object.datatype.value)}`;
+            }
+            return `"${object.value.replace(/"/g, '\\"')}"`;
+        }
+        return object.value;
     }
 }
 
-
 let plugin;
 
-
-
-
+/**
+ * JSDoc plugin handlers
+ */
 export const handlers = {
-
-
-
+    /**
+     * Initialize plugin before parsing
+     */
     beforeParse: function (e) {
-        plugin = new TurtleRDFPlugin();
+        const config = e.env?.conf?.rdfConfig || {};
+        plugin = new TurtleRDFPlugin(config);
     },
 
-
-
-
+    /**
+     * Process each doclet
+     */
     newDoclet: function (e) {
         plugin.processDoclet(e.doclet);
     },
 
-
-
-
+    /**
+     * Write RDF output after processing completion
+     */
     processingComplete: function (e) {
         const outputDir = e.destination || './out';
         const turtleFile = path.join(outputDir, 'api-documentation.ttl');
@@ -296,11 +427,13 @@ export const handlers = {
             fs.mkdirSync(outputDir, { recursive: true });
         }
 
-        plugin.writeTurtle(turtleFile).then(() => {
+        try {
+            const turtle = plugin.toTurtle();
+            fs.writeFileSync(turtleFile, turtle);
             console.log(`Turtle RDF documentation written to: ${turtleFile}`);
-        }).catch(err => {
+        } catch (err) {
             console.error('Error writing Turtle file:', err);
-        });
+        }
     }
 };
 
@@ -309,6 +442,30 @@ export function definePlugin(dictionary) {
         mustHaveValue: false
     };
 }
+</file>
+
+<file path="LICENSE">
+MIT License
+
+Copyright (c) 2025 Danny Ayers
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 </file>
 
 <file path="project_structure.md">
@@ -386,7 +543,7 @@ jsdoc-turtle-rdf-plugin/
     "output": {
         "filePath": "./jsdoc-rdf_repomix.md",
         "headerText": "jsdoc-rdf codebase",
-        "removeComments": true
+        "removeComments": false
     },
     "ignore": {
         "useDefaultPatterns": true,
@@ -409,6 +566,120 @@ jsdoc-turtle-rdf-plugin/
         ]
     }
 }
+</file>
+
+<file path="test-runner.js">
+import { defineConfig } from 'vitest/config';
+
+export default defineConfig({
+  test: {
+    environment: 'node',
+    include: ['**/*.test.js', '**/*test.js'],
+    exclude: ['node_modules/**', 'docs/**', 'out/**'],
+    testTimeout: 10000,
+    globals: false,
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'html'],
+      exclude: [
+        'node_modules/',
+        'docs/',
+        'out/',
+        '**/*.test.js',
+        '**/*test.js',
+        'example.js'
+      ]
+    },
+    outputFile: {
+      json: './test-results.json'
+    }
+  }
+});
+</file>
+
+<file path="vitest_example_test.md">
+# Vitest Commands Reference
+
+## Basic Testing
+
+```bash
+# Run all tests once
+npm run test:run
+
+# Run tests in watch mode (reruns on file changes)
+npm test
+
+# Run specific test file
+vitest test.js
+
+# Run tests with coverage report
+vitest --coverage
+
+# Run tests in silent mode (less output)
+vitest --silent
+```
+
+## Advanced Options
+
+```bash
+# Run tests with custom config
+vitest --config custom-vitest.config.js
+
+# Run tests matching pattern
+vitest --grep "RDF"
+
+# Run tests with debugging
+vitest --inspect-brk
+
+# Generate coverage in different formats
+vitest --coverage --coverage.reporter=lcov
+```
+
+## Integration with JSDoc
+
+```bash
+# Full workflow: generate docs + run tests
+npm run test:example
+
+# Just generate documentation
+npm run example
+
+# Verify plugin functionality
+vitest test.js --verbose
+```
+
+## Vitest Features Used
+
+- **ES Module Support**: Native import/export syntax
+- **Built-in Assertions**: No external assertion library needed  
+- **Fast Execution**: Optimized for modern JavaScript
+- **Watch Mode**: Automatic reruns on file changes
+- **Coverage Reports**: Built-in V8 coverage provider
+- **Node Environment**: Configured for filesystem operations
+</file>
+
+<file path="vitest.config.js">
+import { defineConfig } from 'vitest/config';
+
+export default defineConfig({
+  test: {
+    environment: 'node',
+    include: ['**/*.test.js', '**/*test.js'],
+    exclude: ['node_modules/**', 'docs/**', 'out/**'],
+    testTimeout: 10000,
+    setupFiles: [],
+    coverage: {
+      reporter: ['text', 'json', 'html'],
+      exclude: [
+        'node_modules/',
+        'docs/',
+        'out/',
+        '**/*.test.js',
+        '**/*test.js'
+      ]
+    }
+  }
+});
 </file>
 
 <file path=".gitignore">
@@ -550,62 +821,6 @@ dist
 .pnp.*
 </file>
 
-<file path="example.js">
-class UserManager {
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    async createUser(name, email, options = {}) {
-
-        return { id: 123, name, email, ...options };
-    }
-
-
-
-
-
-
-
-
-
-
-
-    validateCredentials(email, password) {
-
-        return true;
-    }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-function formatUserName(user) {
-    return `${user.firstName} ${user.lastName}`;
-}
-
-export { UserManager, formatUserName };
-</file>
-
 <file path="jsdoc.conf.json">
 {
   "source": {
@@ -626,38 +841,17 @@ export { UserManager, formatUserName };
   "templates": {
     "cleverLinks": false,
     "monospaceLinks": false
+  },
+  "rdfConfig": {
+    "baseUri": "https://your-project.com/api/"
   }
 }
-</file>
-
-<file path="LICENSE">
-MIT License
-
-Copyright (c) 2025 Danny Ayers
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
 </file>
 
 <file path="package.json">
 {
   "name": "jsdoc-rdf",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "JSDoc plugin to generate Turtle RDF documentation",
   "type": "module",
   "main": "jsdoc-rdf.js",
@@ -680,8 +874,7 @@ SOFTWARE.
   },
   "homepage": "https://github.com/danny-ayers/jsdoc-turtle-rdf-plugin",
   "dependencies": {
-    "rdfjs": "^4.0.2",
-    "rdf-ext": "^2.4.0"
+    "rdf-ext": "^2.5.2"
   },
   "peerDependencies": {
     "jsdoc": "^4.0.0"
@@ -703,42 +896,18 @@ SOFTWARE.
     "rp": "repomix -c repomix.config.json ."
   },
   "devDependencies": {
-    "vitest": "^1.0.0",
-    "jsdoc": "^4.0.0"
+    "jsdoc": "^4.0.0",
+    "vitest": "^1.0.0"
   }
 }
 </file>
 
-<file path="test-runner.js">
-import { defineConfig } from 'vitest/config';
-
-export default defineConfig({
-  test: {
-    environment: 'node',
-    include: ['**/*.test.js', '**/*test.js'],
-    exclude: ['node_modules/**', 'docs/**', 'out/**'],
-    testTimeout: 10000,
-    globals: false,
-    coverage: {
-      provider: 'v8',
-      reporter: ['text', 'json', 'html'],
-      exclude: [
-        'node_modules/',
-        'docs/',
-        'out/',
-        '**/*.test.js',
-        '**/*test.js',
-        'example.js'
-      ]
-    },
-    outputFile: {
-      json: './test-results.json'
-    }
-  }
-});
-</file>
-
 <file path="test.js">
+/**
+ * Test suite for JSDoc Turtle RDF Plugin
+ * @author Danny Ayers <danny.ayers@gmail.com>
+ */
+
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import fs from 'fs';
 import path from 'path';
@@ -749,14 +918,14 @@ describe('JSDoc Turtle RDF Plugin', () => {
     const turtleFile = path.join(outputDir, 'api-documentation.ttl');
 
     beforeAll(() => {
-
+        // Clean up previous test outputs
         if (fs.existsSync(outputDir)) {
             fs.rmSync(outputDir, { recursive: true });
         }
-
-
+        
+        // Generate documentation first
         try {
-            execSync(`jsdoc -c jsdoc.conf.json example.js -d ${outputDir}`, {
+            execSync(`jsdoc -c jsdoc.conf.json example.js -d ${outputDir}`, { 
                 stdio: 'pipe',
                 encoding: 'utf8'
             });
@@ -767,24 +936,24 @@ describe('JSDoc Turtle RDF Plugin', () => {
     });
 
     afterAll(() => {
-
+        // Clean up test outputs
         if (fs.existsSync(outputDir)) {
             fs.rmSync(outputDir, { recursive: true });
         }
     });
 
     it('should generate Turtle RDF file', () => {
-
+        // Check if Turtle file was created
         expect(fs.existsSync(turtleFile)).toBe(true);
-
-
+        
+        // Verify file has content
         const stats = fs.statSync(turtleFile);
         expect(stats.size).toBeGreaterThan(0);
     });
 
     it('should contain RDF namespaces', () => {
         const content = fs.readFileSync(turtleFile, 'utf8');
-
+        
         expect(content).toContain('@prefix foaf:');
         expect(content).toContain('@prefix dcterms:');
         expect(content).toContain('@prefix jsdoc:');
@@ -794,7 +963,7 @@ describe('JSDoc Turtle RDF Plugin', () => {
 
     it('should contain class information', () => {
         const content = fs.readFileSync(turtleFile, 'utf8');
-
+        
         expect(content).toContain('UserManager');
         expect(content).toContain('jsdoc:kind');
         expect(content).toContain('"class"');
@@ -802,34 +971,34 @@ describe('JSDoc Turtle RDF Plugin', () => {
 
     it('should contain function parameters', () => {
         const content = fs.readFileSync(turtleFile, 'utf8');
-
+        
         expect(content).toContain('jsdoc:hasParameter');
         expect(content).toContain('jsdoc:parameterType');
     });
 
     it('should contain return information', () => {
         const content = fs.readFileSync(turtleFile, 'utf8');
-
+        
         expect(content).toContain('jsdoc:returns');
         expect(content).toContain('jsdoc:returnType');
     });
 
     it('should contain examples', () => {
         const content = fs.readFileSync(turtleFile, 'utf8');
-
+        
         expect(content).toContain('jsdoc:hasExample');
     });
 
     it('should contain author information', () => {
         const content = fs.readFileSync(turtleFile, 'utf8');
-
+        
         expect(content).toContain('dcterms:creator');
         expect(content).toContain('John Developer');
     });
 
     it('should contain DOAP project information', () => {
         const content = fs.readFileSync(turtleFile, 'utf8');
-
+        
         expect(content).toContain('doap:Project');
         expect(content).toContain('doap:maintainer');
         expect(content).toContain('Danny Ayers');
@@ -838,98 +1007,13 @@ describe('JSDoc Turtle RDF Plugin', () => {
 
     it('should be valid Turtle syntax', () => {
         const content = fs.readFileSync(turtleFile, 'utf8');
-
-
+        
+        // Basic syntax checks
         expect(content).toContain('@prefix');
-        expect(content).toMatch(/\s+\.\s*$/m);
+        expect(content).toMatch(/\s+\.\s*$/m); // Should end statements with dots
         expect(content).not.toContain('undefined');
         expect(content).not.toContain('null');
     });
-});
-</file>
-
-<file path="vitest_example_test.md">
-# Vitest Commands Reference
-
-## Basic Testing
-
-```bash
-# Run all tests once
-npm run test:run
-
-# Run tests in watch mode (reruns on file changes)
-npm test
-
-# Run specific test file
-vitest test.js
-
-# Run tests with coverage report
-vitest --coverage
-
-# Run tests in silent mode (less output)
-vitest --silent
-```
-
-## Advanced Options
-
-```bash
-# Run tests with custom config
-vitest --config custom-vitest.config.js
-
-# Run tests matching pattern
-vitest --grep "RDF"
-
-# Run tests with debugging
-vitest --inspect-brk
-
-# Generate coverage in different formats
-vitest --coverage --coverage.reporter=lcov
-```
-
-## Integration with JSDoc
-
-```bash
-# Full workflow: generate docs + run tests
-npm run test:example
-
-# Just generate documentation
-npm run example
-
-# Verify plugin functionality
-vitest test.js --verbose
-```
-
-## Vitest Features Used
-
-- **ES Module Support**: Native import/export syntax
-- **Built-in Assertions**: No external assertion library needed  
-- **Fast Execution**: Optimized for modern JavaScript
-- **Watch Mode**: Automatic reruns on file changes
-- **Coverage Reports**: Built-in V8 coverage provider
-- **Node Environment**: Configured for filesystem operations
-</file>
-
-<file path="vitest.config.js">
-import { defineConfig } from 'vitest/config';
-
-export default defineConfig({
-  test: {
-    environment: 'node',
-    include: ['**/*.test.js', '**/*test.js'],
-    exclude: ['node_modules/**', 'docs/**', 'out/**'],
-    testTimeout: 10000,
-    setupFiles: [],
-    coverage: {
-      reporter: ['text', 'json', 'html'],
-      exclude: [
-        'node_modules/',
-        'docs/',
-        'out/',
-        '**/*.test.js',
-        '**/*test.js'
-      ]
-    }
-  }
 });
 </file>
 
@@ -959,6 +1043,9 @@ Place `jsdoc-rdf.js` in your project directory and add to JSDoc configuration:
   "plugins": ["./jsdoc-rdf.js"],
   "opts": {
     "destination": "./docs/"
+  },
+  "rdfConfig": {
+    "baseUri": "https://your-project.com/api/"
   }
 }
 ```
@@ -977,6 +1064,22 @@ jsdoc --plugin ./jsdoc-rdf.js source-files.js -d ./docs/
 
 - Standard JSDoc HTML documentation in `./docs/`
 - Semantic RDF documentation in `./docs/api-documentation.ttl`
+
+## Configuration
+
+### Base URI
+
+Configure the RDF namespace via `rdfConfig.baseUri` in JSDoc configuration:
+
+```json
+{
+  "rdfConfig": {
+    "baseUri": "https://myproject.example.org/api/"
+  }
+}
+```
+
+Default: `http://example.org/api/`
 
 ## ES Module Support
 
@@ -1029,17 +1132,36 @@ The plugin maps JSDoc elements to RDF using these vocabularies:
 - **DCTERMS**: `http://purl.org/dc/terms/` - Dublin Core terms
 - **RDFS**: `http://www.w3.org/2000/01/rdf-schema#` - RDF Schema elements
 - **JSDOC**: `http://example.org/jsdoc#` - Custom JSDoc properties
-- **DOAP**: `http://usefulinc.com/ns/doap#` - Description of a Project vocabulary
+- **XSD**: `http://www.w3.org/2001/XMLSchema#` - XML Schema datatypes
 
 ## Supported JSDoc Tags
 
-- `@param` → `jsdoc:hasParameter`
+### Core Documentation
+- `@param` → `jsdoc:hasParameter` with optional/defaultValue flags
 - `@returns` → `jsdoc:returns`
+- `@throws` → `jsdoc:throws`
 - `@example` → `jsdoc:hasExample`
+- `@description` → `dcterms:description`
+
+### Metadata
 - `@author` → `dcterms:creator`
 - `@version` → `dcterms:hasVersion`
 - `@since` → `dcterms:created`
-- `@description` → `dcterms:description`
+- `@see` → `rdfs:seeAlso`
+- `@todo` → `jsdoc:todo`
+
+### Structure & Access
+- `@memberof` → `jsdoc:memberOf`
+- `@access` → `jsdoc:access`
+- `@scope` → `jsdoc:scope`
+- `@readonly` → `jsdoc:readonly`
+- `@deprecated` → `jsdoc:deprecated`
+- `@abstract` → `jsdoc:abstract`
+- `@override` → `jsdoc:override`
+
+### Inheritance
+- `@extends` / `@augments` → `jsdoc:extends`
+- `@implements` → `jsdoc:implements`
 
 ## Example Output
 
@@ -1047,40 +1169,26 @@ The plugin maps JSDoc elements to RDF using these vocabularies:
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
 @prefix dcterms: <http://purl.org/dc/terms/> .
 @prefix jsdoc: <http://example.org/jsdoc#> .
-@prefix doap: <http://usefulinc.com/ns/doap#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<http://example.org/api/UserManager>
+<https://your-project.com/api/UserManager>
     rdfs:label "UserManager" ;
     dcterms:description "User management utility class" ;
     jsdoc:kind "class" ;
     dcterms:creator "John Developer" ;
-    dcterms:hasVersion "2.1.0" .
+    dcterms:hasVersion "2.1.0" ;
+    jsdoc:hasParameter <https://your-project.com/api/UserManager/createUser/param/0> .
 
-<http://example.org/api/project> a doap:Project ;
-    doap:name "JSDoc Turtle RDF Plugin" ;
-    doap:maintainer <https://danny.ayers.name#me> .
+<https://your-project.com/api/UserManager/createUser/param/0>
+    rdfs:label "name" ;
+    dcterms:description "The user's full name" ;
+    jsdoc:parameterType "string" .
 ```
 
 ## DOAP Project Profile
 
-A standalone DOAP (Description of a Project) profile is included as `project.ttl`. This provides semantic metadata about the plugin project itself, including:
-
-- Project description and homepage
-- Maintainer and developer information
-- Repository location and license
-- Programming language and categories
-
-## Configuration Options
-
-Modify the plugin's `baseUri` property to customize RDF namespace. Since this uses ES modules, you can import and extend the plugin:
-
-```javascript
-// Custom plugin configuration
-import { handlers, definePlugin } from './jsdoc-rdf.js';
-
-// Modify baseUri before JSDoc processing
-// Access through plugin instance during beforeParse handler
-```
+A static DOAP (Description of a Project) profile is included as `doap.ttl`. This provides semantic metadata about the plugin project itself. The generated RDF documentation focuses solely on your documented JavaScript code.
 
 ## Requirements
 

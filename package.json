@@ -23,8 +23,7 @@
   },
   "homepage": "https://github.com/danny-ayers/jsdoc-turtle-rdf-plugin",
   "dependencies": {
-    "rdfjs": "^4.0.2",
-    "rdf-ext": "^2.4.0"
+    "rdf-ext": "^2.5.2"
   },
   "peerDependencies": {
     "jsdoc": "^4.0.0"
@@ -35,18 +34,19 @@
   "files": [
     "jsdoc-rdf.js",
     "vitest.config.js",
-    "project.ttl",
+    "doap.ttl",
     "README.md"
   ],
   "scripts": {
     "test": "vitest --run",
     "test:watch": "vitest --watch",
     "example": "jsdoc -c jsdoc.conf.json example.js",
-    "test:example": "npm run example && npm run test:run",
+    "test:example": "npm run example && npm run test",
+    "clean": "rm -rf docs/",
     "rp": "repomix -c repomix.config.json ."
   },
   "devDependencies": {
-    "vitest": "^1.0.0",
-    "jsdoc": "^4.0.0"
+    "jsdoc": "^4.0.0",
+    "vitest": "^1.0.0"
   }
 }

@@ -2,7 +2,7 @@
     "output": {
         "filePath": "./jsdoc-rdf_repomix.md",
         "headerText": "jsdoc-rdf codebase",
-        "removeComments": true
+        "removeComments": false
     },
     "ignore": {
         "useDefaultPatterns": true,
