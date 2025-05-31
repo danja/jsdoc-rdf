@@ -1,9 +1,9 @@
 {
-  "name": "jsdoc-turtle-rdf-plugin",
-  "version": "1.0.0",
+  "name": "jsdoc-rdf",
+  "version": "0.1.0",
   "description": "JSDoc plugin to generate Turtle RDF documentation",
   "type": "module",
-  "main": "jsdoc-turtle-plugin.js",
+  "main": "jsdoc-rdf.js",
   "keywords": [
     "jsdoc",
     "rdf",
@@ -11,9 +11,19 @@
     "documentation",
     "semantic"
   ],
-  "author": "Expert Adviser",
+  "author": {
+    "name": "Danny Ayers",
+    "email": "danny.ayers@gmail.com",
+    "url": "https://danny.ayers.name"
+  },
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/danny-ayers/jsdoc-turtle-rdf-plugin.git"
+  },
+  "homepage": "https://github.com/danny-ayers/jsdoc-turtle-rdf-plugin",
   "dependencies": {
+    "rdfjs": "^4.0.2",
     "rdf-ext": "^2.4.0"
   },
   "peerDependencies": {
@@ -23,19 +33,20 @@
     "node": ">=14.0.0"
   },
   "files": [
-    "jsdoc-turtle-plugin.js",
+    "jsdoc-rdf.js",
     "vitest.config.js",
+    "project.ttl",
     "README.md"
   ],
   "scripts": {
-    "test": "vitest",
-    "test:run": "vitest run",
+    "test": "vitest --run",
     "test:watch": "vitest --watch",
     "example": "jsdoc -c jsdoc.conf.json example.js",
-    "test:example": "npm run example && npm run test:run"
+    "test:example": "npm run example && npm run test:run",
+    "rp": "repomix -c repomix.config.json ."
   },
   "devDependencies": {
-    "jsdoc": "^4.0.4",
-    "vitest": "^1.6.1"
+    "vitest": "^1.0.0",
+    "jsdoc": "^4.0.0"
   }
 }

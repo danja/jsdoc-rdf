@@ -1,0 +1,33 @@
+@prefix doap: <http://usefulinc.com/ns/doap#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<https://github.com/danny-ayers/jsdoc-turtle-rdf-plugin> a doap:Project ;
+    doap:name "JSDoc Turtle RDF Plugin" ;
+    doap:shortdesc "JSDoc plugin to generate Turtle RDF documentation" ;
+    doap:description """Converts JSDoc comments to semantic Turtle RDF format alongside 
+                       standard HTML documentation. Enables semantic web integration 
+                       of JavaScript API documentation.""" ;
+    doap:homepage <https://github.com/danny-ayers/jsdoc-turtle-rdf-plugin> ;
+    doap:programming-language "JavaScript" ;
+    doap:license <http://usefulinc.com/doap/licenses/mit> ;
+    doap:repository [
+        a doap:Repository ;
+        doap:browse <https://github.com/danny-ayers/jsdoc-turtle-rdf-plugin> ;
+        doap:location <https://github.com/danny-ayers/jsdoc-turtle-rdf-plugin.git>
+    ] ;
+    doap:maintainer <https://danny.ayers.name#me> ;
+    doap:developer <https://danny.ayers.name#me> ;
+    doap:revision "1.0.0" ;
+    doap:created "2025-05-31"^^xsd:date ;
+    doap:category <http://projects.apache.org/category/build-management> ;
+    doap:implements <http://usefulinc.com/ns/doap#specification> ;
+    dcterms:subject "documentation", "semantic web", "rdf", "javascript" .
+
+<https://danny.ayers.name#me> a foaf:Person ;
+    foaf:name "Danny Ayers" ;
+    foaf:mbox <mailto:danny.ayers@gmail.com> ;
+    foaf:homepage <https://danny.ayers.name> ;
+    rdfs:seeAlso <https://danny.ayers.name/foaf.rdf> .

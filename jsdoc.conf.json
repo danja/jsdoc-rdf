@@ -1,14 +1,18 @@
 {
   "source": {
-    "include": ["./"],
+    "include": [
+      "./"
+    ],
     "includePattern": "\\.(js|jsx)$",
-    "exclude": ["node_modules/"]
+    "exclude": [
+      "node_modules/"
+    ]
   },
   "opts": {
     "destination": "./docs/"
   },
   "plugins": [
-    "./jsdoc-turtle-plugin.js"
+    "./jsdoc-rdf.js"
   ],
   "templates": {
     "cleverLinks": false,

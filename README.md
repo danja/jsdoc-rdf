@@ -2,6 +2,9 @@
 
 Converts JSDoc comments to semantic Turtle RDF documentation alongside standard HTML output. Built with ES modules for modern JavaScript environments.
 
+**Author:** Danny Ayers <danny.ayers@gmail.com>  
+**Homepage:** https://danny.ayers.name
+
 ## Installation
 
 ```bash
@@ -13,11 +16,11 @@ npm install --save-dev vitest jsdoc
 
 ### 1. Plugin Setup
 
-Place `jsdoc-turtle-plugin.js` in your project directory and add to JSDoc configuration:
+Place `jsdoc-rdf.js` in your project directory and add to JSDoc configuration:
 
 ```json
 {
-  "plugins": ["./jsdoc-turtle-plugin.js"],
+  "plugins": ["./jsdoc-rdf.js"],
   "opts": {
     "destination": "./docs/"
   }
@@ -31,7 +34,7 @@ Place `jsdoc-turtle-plugin.js` in your project directory and add to JSDoc config
 jsdoc -c jsdoc.conf.json source-files.js
 
 # Direct command line
-jsdoc --plugin ./jsdoc-turtle-plugin.js source-files.js -d ./docs/
+jsdoc --plugin ./jsdoc-rdf.js source-files.js -d ./docs/
 ```
 
 ### 3. Output
@@ -86,10 +89,11 @@ npm run test:example
 
 The plugin maps JSDoc elements to RDF using these vocabularies:
 
-- **FOAF**: `http://xmlns.com/foaf/0.1/` - Basic metadata
+- **FOAF**: `http://xmlns.com/foaf/0.1/` - Friend of a Friend ontology
 - **DCTERMS**: `http://purl.org/dc/terms/` - Dublin Core terms
-- **RDFS**: `http://www.w3.org/2000/01/rdf-schema#` - Schema elements
+- **RDFS**: `http://www.w3.org/2000/01/rdf-schema#` - RDF Schema elements
 - **JSDOC**: `http://example.org/jsdoc#` - Custom JSDoc properties
+- **DOAP**: `http://usefulinc.com/ns/doap#` - Description of a Project vocabulary
 
 ## Supported JSDoc Tags
 
@@ -107,6 +111,7 @@ The plugin maps JSDoc elements to RDF using these vocabularies:
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
 @prefix dcterms: <http://purl.org/dc/terms/> .
 @prefix jsdoc: <http://example.org/jsdoc#> .
+@prefix doap: <http://usefulinc.com/ns/doap#> .
 
 <http://example.org/api/UserManager>
     rdfs:label "UserManager" ;
@@ -114,7 +119,20 @@ The plugin maps JSDoc elements to RDF using these vocabularies:
     jsdoc:kind "class" ;
     dcterms:creator "John Developer" ;
     dcterms:hasVersion "2.1.0" .
+
+<http://example.org/api/project> a doap:Project ;
+    doap:name "JSDoc Turtle RDF Plugin" ;
+    doap:maintainer <https://danny.ayers.name#me> .
 ```
+
+## DOAP Project Profile
+
+A standalone DOAP (Description of a Project) profile is included as `project.ttl`. This provides semantic metadata about the plugin project itself, including:
+
+- Project description and homepage
+- Maintainer and developer information
+- Repository location and license
+- Programming language and categories
 
 ## Configuration Options
 
@@ -122,7 +140,7 @@ Modify the plugin's `baseUri` property to customize RDF namespace. Since this us
 
 ```javascript
 // Custom plugin configuration
-import { handlers, definePlugin } from './jsdoc-turtle-plugin.js';
+import { handlers, definePlugin } from './jsdoc-rdf.js';
 
 // Modify baseUri before JSDoc processing
 // Access through plugin instance during beforeParse handler
