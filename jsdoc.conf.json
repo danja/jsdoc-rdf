@@ -1,0 +1,17 @@
+{
+  "source": {
+    "include": ["./"],
+    "includePattern": "\\.(js|jsx)$",
+    "exclude": ["node_modules/"]
+  },
+  "opts": {
+    "destination": "./docs/"
+  },
+  "plugins": [
+    "./jsdoc-turtle-plugin.js"
+  ],
+  "templates": {
+    "cleverLinks": false,
+    "monospaceLinks": false
+  }
+}

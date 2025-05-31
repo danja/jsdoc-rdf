@@ -1,0 +1,41 @@
+{
+  "name": "jsdoc-turtle-rdf-plugin",
+  "version": "1.0.0",
+  "description": "JSDoc plugin to generate Turtle RDF documentation",
+  "type": "module",
+  "main": "jsdoc-turtle-plugin.js",
+  "keywords": [
+    "jsdoc",
+    "rdf",
+    "turtle",
+    "documentation",
+    "semantic"
+  ],
+  "author": "Expert Adviser",
+  "license": "MIT",
+  "dependencies": {
+    "rdf-ext": "^2.4.0"
+  },
+  "peerDependencies": {
+    "jsdoc": "^4.0.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "files": [
+    "jsdoc-turtle-plugin.js",
+    "vitest.config.js",
+    "README.md"
+  ],
+  "scripts": {
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:watch": "vitest --watch",
+    "example": "jsdoc -c jsdoc.conf.json example.js",
+    "test:example": "npm run example && npm run test:run"
+  },
+  "devDependencies": {
+    "jsdoc": "^4.0.4",
+    "vitest": "^1.6.1"
+  }
+}
